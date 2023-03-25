@@ -1,41 +1,39 @@
 #include "monty.h"
-/**
- * f_mod - computes the rest of the division of the second
- * top element of the stack by the top element of the stack
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_mod(stack_t **head, unsigned int counter)
-{
-	stack_t *h;
-	int len = 0, aux;
 
-	h = *head;
-	while (h)
+/**
+ * s_mod - computes the rest of the division of the second top element of
+ *	stack by the top element of the stack.
+ * @stack: pointer to top/head
+ * @line_number: current line number
+ */
+void s_mod(stack_t **stack, unsigned int line_number)
+{
+	stack_t *temp = *stack;
+	int mod = 0;
+
+	if (*stack && (*stack)->next)
 	{
-		h = h->next;
-		len++;
+		if ((*stack)->next->n == 0)
+		{
+			fprintf(stderr, "L%u: division by zero\n", line_number);
+			free(global.content);
+			fclose(global.file);
+			free_stack(stack);
+			exit(EXIT_FAILURE);
+		}
+		mod = temp->next->n % temp->n;
+		temp->next->n = mod;
+		*stack = temp->next;
+		free(temp);
+		if (*stack)
+			(*stack)->prev = NULL;
 	}
-	if (len < 2)
+	else
 	{
-		fprintf(stderr, "L%d: can't mod, stack too short\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
+		fprintf(stderr, "L%u: can't mod, stack too short\n", line_number);
+		free(global.content);
+		fclose(global.file);
+		free_stack(stack);
 		exit(EXIT_FAILURE);
 	}
-	h = *head;
-	if (h->n == 0)
-	{
-		fprintf(stderr, "L%d: division by zero\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
-		exit(EXIT_FAILURE);
-	}
-	aux = h->next->n % h->n;
-	h->next->n = aux;
-	*head = h->next;
-	free(h);
 }
