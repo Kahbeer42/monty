@@ -1,71 +1,58 @@
 #include "monty.h"
-
 /**
- * s_push - pushes an element to the stack (or queue)
- * @stack: head
- * @line_number: current line number
- */
-void s_push(stack_t **stack, unsigned int line_number)
+ * f_push - add node to the stack
+ * @head: stack head
+ * @counter: line_number
+ * Return: no return
+*/
+void f_push(stack_t **head, unsigned int counter)
 {
-	stack_t *new;
+	int n, j = 0, flag = 0;
 
-	_verify(stack, line_number);
-	if (global.token)
+	if (bus.arg)
 	{
-		new = malloc(sizeof(stack_t));
-		if (new == NULL)
+		if (bus.arg[0] == '-')
+			j++;
+		for (; bus.arg[j] != '\0'; j++)
 		{
-			fputs("Error: malloc failed\n", stderr);
-			exit(EXIT_FAILURE);
-		}
-		new->n = global.num, new->next = NULL;
-		new->prev = NULL;
-		if (*stack)
-		{
-			if (global.flag == 1)
-			{
-				new->next = *stack;
-				(*stack)->prev = new;
-				*stack = new;
-			}
-			else
-			{
-				while ((*stack)->next)
-					*stack = (*stack)->next;
-				(*stack)->next = new, new->prev = *stack;
-				while ((*stack)->prev)
-					*stack = (*stack)->prev;
-			}
-		}
-		else
-			*stack = new;
-	}
+			if (bus.arg[j] > 57 || bus.arg[j] < 48)
+				flag = 1; }
+		if (flag == 1)
+		{ fprintf(stderr, "L%d: usage: push integer\n", counter);
+			fclose(bus.file);
+			free(bus.content);
+			free_stack(*head);
+			exit(EXIT_FAILURE); }}
 	else
-	{
-		free(global.content), fclose(global.file);
-		fprintf(stderr, "L%u: usage: push integer\n", line_number);
-		free_stack(stack);
-		exit(EXIT_FAILURE);
-	}
+	{ fprintf(stderr, "L%d: usage: push integer\n", counter);
+		fclose(bus.file);
+		free(bus.content);
+		free_stack(*head);
+		exit(EXIT_FAILURE); }
+	n = atoi(bus.arg);
+	if (bus.lifi == 0)
+		addnode(head, n);
+	else
+		addqueue(head, n);
 }
 
 /**
- * s_pall - prints all the values on the stack,
- * starting from the top of the stack
- * @stack: head
- * @line_number: current line number
- */
-void s_pall(stack_t **stack, unsigned int line_number)
+ * f_pall - prints the stack
+ * @head: stack head
+ * @counter: no used
+ * Return: no return
+*/
+void f_pall(stack_t **head, unsigned int counter)
 {
-	stack_t *temp;
+	stack_t *h;
+	(void)counter;
 
-	temp = *stack;
-	if (temp == NULL)
+	h = *head;
+	if (h == NULL)
 		return;
-	if (line_number)
-		while (temp)
-		{
-			printf("%d\n", temp->n);
-			temp = temp->next;
-		}
+	while (h)
+	{
+		printf("%d\n", h->n);
+		h = h->next;
+	}
 }
